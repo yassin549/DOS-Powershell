@@ -97,3 +97,102 @@ public:
         {
             for (auto it = files->begin(); it != files->end(); ++it)
             {
+                if (it->name == _name)
+                {
+                    return &(*it);
+                }
+            }
+        }
+        return nullptr;
+    }
+
+    void printPath()
+    {
+        if (path == "V")
+        {
+            cout << "V:\\" << endl;
+        }
+        else
+        {
+            cout << path << endl;
+        }
+    }
+
+    string setPath()
+    {
+        if (parent == nullptr)
+        {
+            return "V:\\";
+        }
+        return parent->path + name + "\\";
+    }
+
+    // checking if directory already exists
+    bool checkDirectory(string _name)
+    {
+        for (auto it = directories->begin(); it != directories->end(); it++)
+        {
+            if (it->name == _name)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // checking if file already exists
+    bool checkFile(string _name)
+    {
+        for (auto it = files->begin(); it != files->end(); it++)
+        {
+            if (it->name == _name)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // get directory through path
+    Directory *getDirectoryFromPath(string _path)
+    {
+        if (_path == "V:\\" || _path == "V:")
+        {
+            return this;
+        }
+        else if (_path.find("\\") != string::npos)
+        {
+            string name = _path.substr(0, _path.find("\\"));
+
+            if (name == "V:\\" || name == "V:")
+            {
+                return this->getDirectoryFromPath(_path.substr(_path.find("\\") + 1, _path.length() - 1));
+            }
+
+            for (auto it = directories->begin(); it != directories->end(); ++it)
+            {
+                if (it->name == name)
+                {
+                    return it->getDirectoryFromPath(_path.substr(_path.find("\\") + 1, _path.length() - 1));
+                }
+            }
+        }
+        else
+        {
+            for (auto it = directories->begin(); it != directories->end(); ++it)
+            {
+                if (it->name == _path)
+                {
+                    return &(*it);
+                }
+            }
+        }
+        return nullptr;
+    }
+};
+
+// class to store current condition of text
+class Condition
+{
+public:
+    list<list<char>> *lines;
