@@ -196,3 +196,102 @@ class Condition
 {
 public:
     list<list<char>> *lines;
+    list<list<char>>::iterator rowItr;
+    list<char>::iterator colItr;
+    int cursorX, cursorY;
+
+    Condition()
+    {
+        lines = new list<list<char>>();
+        lines->push_back(list<char>());
+        rowItr = lines->begin();
+        colItr = rowItr->begin();
+        cursorX = cursorY = 0;
+    }
+
+    void printData()
+    {
+        for (auto it = lines->begin(); it != lines->end(); ++it)
+        {
+            for (auto it2 = it->begin(); it2 != it->end(); ++it2)
+            {
+                cout << *it2;
+            }
+            cout << endl;
+        }
+    }
+};
+
+// text editor
+class TextEditor
+{
+public:
+    int cursorX;
+    int cursorY;
+    list<list<char>> *lines;
+    list<list<char>>::iterator rowItr;
+    list<char>::iterator colItr;
+    stack<Condition *> *redo;
+    deque<Condition *> *undo;
+
+    TextEditor()
+    {
+        cursorX = cursorY = 0;
+        lines = new list<list<char>>();
+        lines->push_back(list<char>());
+        redo = new stack<Condition *>();
+        undo = new deque<Condition *>();
+        rowItr = lines->begin();
+        colItr = rowItr->begin();
+    }
+
+    void loadFile(Files *file){
+        string data = file->data;
+        string line = "";
+
+        // copying the data into lines
+        for (int i = 0; i < data.length(); i++){
+            if (data[i] == '\n'){
+                rowItr = lines->insert(rowItr, list<char>());
+                for (int j = 0; j < line.length(); j++){
+                    rowItr->push_back(line[j]);
+                }
+                line = "";
+                rowItr++;
+            }
+            else{
+                line += data[i];
+            }
+        }
+
+        // if last line is not empty
+        if (line.length() > 0){
+            rowItr = lines->insert(rowItr, list<char>());
+            for (int j = 0; j < line.length(); j++){
+                rowItr->push_back(line[j]);
+            }
+        }
+        rowItr = lines->begin();
+        colItr = rowItr->begin();
+
+        // removing last lines if it is empty
+        auto temp = lines->begin();
+        for (auto it = lines->begin(); it != lines->begin(); it++){
+            temp++;
+        }
+        temp++;
+        if (temp->empty()){
+            lines->erase(temp);
+        }
+    }
+
+    // save current condition of text
+    void saveCondition()
+    {
+        Condition *condition = new Condition();
+
+        auto r_itr = condition->lines->begin();
+        for (auto it = lines->begin(); it != lines->end(); it++, r_itr++){
+
+            condition->lines->push_back(list<char>());
+            for (auto it2 = it->begin(); it2 != it->end(); it2++)
