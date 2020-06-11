@@ -295,3 +295,102 @@ public:
 
             condition->lines->push_back(list<char>());
             for (auto it2 = it->begin(); it2 != it->end(); it2++)
+            {
+                r_itr->push_back(*it2);
+            }
+        }
+
+        condition->rowItr = condition->lines->begin();
+        for (int i = 0; i < cursorY; i++){
+            condition->rowItr++;
+        }
+        condition->colItr = condition->rowItr->begin();
+        for (int i = 0; i < cursorX; i++){
+            condition->colItr++;
+        }
+        condition->cursorX = cursorX;
+        condition->cursorY = cursorY;
+
+        undo->push_back(condition);
+
+        if (undo->size() > 5){
+            undo->pop_front();
+        }
+    }
+
+    // load previous condition of text
+    void loadCondition(Condition *condition){
+
+        lines = condition->lines;
+        rowItr = lines->begin();
+        cursorX = condition->cursorX;
+        cursorY = condition->cursorY;
+        for (int i = 0; i < cursorY; i++){
+            rowItr++;
+        }
+        colItr = rowItr->begin();
+        for (int i = 0; i <= cursorX; i++){
+            colItr++;
+        }
+    }
+
+    void print(){
+        for (auto it = lines->begin(); it != lines->end(); ++it){
+            for (auto it2 = it->begin(); it2 != it->end(); ++it2){
+                cout << *it2;
+            }
+            cout << endl;
+        }
+    }
+
+    void save(Files *file)
+    {
+        string data = "";
+        for (auto it = lines->begin(); it != lines->end(); ++it){
+            for (auto it2 = it->begin(); it2 != it->end(); ++it2){
+                data += *it2;
+            }
+            data += "\n";
+        }
+        data.pop_back();
+        file->data = data;
+    }
+
+    void moveUp(){
+        if (cursorY != 0){
+            cursorY--;
+            rowItr--;
+            if (cursorX >= rowItr->size()){
+                cursorX = rowItr->size();
+            }
+            colItr = rowItr->begin();
+            for (int i = 0; i < cursorX; i++){
+                colItr++;
+            }
+        }
+    }
+
+    void moveDown(){
+        if (cursorY != lines->size() - 1){
+            cursorY++;
+            rowItr++;
+            if (cursorX >= rowItr->size()){
+                cursorX = rowItr->size();
+            }
+            colItr = rowItr->begin();
+            for (int i = 0; i < cursorX; i++){
+                colItr++;
+            }
+        }
+    }
+
+    void moveLeft(){
+        if (cursorX == 0 && cursorY != 0){
+            rowItr--;
+            cursorY--;
+            cursorX = rowItr->size();
+            colItr = rowItr->begin();
+            for (int i = 0; i < cursorX; i++){
+                colItr++;
+            }
+        }
