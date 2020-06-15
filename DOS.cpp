@@ -394,3 +394,102 @@ public:
                 colItr++;
             }
         }
+        else if (cursorX != 0){
+            cursorX--;
+            colItr--;
+        }
+    }
+
+    void moveRight(){
+        if (rowItr->size() == 0){
+            return;
+        }
+        if (cursorX > rowItr->size() - 1 && cursorY != lines->size() - 1){
+            rowItr++;
+            cursorY++;
+            cursorX = 0;
+            colItr = rowItr->begin();
+        }
+        else if (cursorX <= rowItr->size() - 1){
+            cursorX++;
+            colItr++;
+        }
+    }
+
+    void removeBack(){
+        if (cursorX == 0 && cursorY != 0){
+
+            // copy data of this line
+            list<char> *temp = new list<char>();
+            for (auto it = colItr; it != rowItr->end(); ++it){
+                temp->push_back(*it);
+            }
+
+            // erase this line
+            rowItr = lines->erase(rowItr);
+
+            // move to previous line
+            rowItr--;
+            cursorY--;
+            cursorX = rowItr->size();
+            colItr = rowItr->begin();
+            for (int i = 0; i < cursorX; i++){
+                colItr++;
+            }
+
+            // paste data of next line to current line
+            for (auto it = temp->begin(); it != temp->end(); ++it){
+                rowItr->push_back(*it);
+            }
+        }
+        else if (cursorX != 0){
+            cursorX--;
+            colItr--;
+            colItr = rowItr->erase(colItr);
+        }
+    }
+
+    void removeForward(){
+        if (cursorX == rowItr->size() && cursorY != lines->size() - 1){
+
+            // copy data of next line
+            list<char> *temp = new list<char>();
+            auto tempItr = rowItr;
+            tempItr++;
+            for (auto it = tempItr->begin(); it != tempItr->end(); ++it){
+                temp->push_back(*it);
+            }
+
+            // erase next line
+            // rowItr = lines->erase(tempItr);
+            lines->erase(tempItr);
+
+            // paste data of next line to current line
+            for (auto it = temp->begin(); it != temp->end(); ++it){
+                rowItr->push_back(*it);
+            }
+
+            // reset column iterator
+            colItr = rowItr->begin();
+            for (int i = 0; i < cursorX; i++){
+                colItr++;
+            }
+        }
+        else if (cursorX != rowItr->size()){
+            colItr = rowItr->erase(colItr);
+        }
+    }
+
+    void addNewLine(){
+
+        // first copy the rest of the list
+        list<char> *temp = new list<char>();
+        for (auto it = colItr; it != rowItr->end(); ++it){
+            temp->push_back(*it);
+        }
+
+        // erase it in the current line and paste in the next line
+        rowItr->erase(colItr, rowItr->end());
+        rowItr = lines->insert(++rowItr, *temp);
+        colItr = rowItr->begin();
+
