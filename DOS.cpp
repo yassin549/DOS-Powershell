@@ -493,3 +493,102 @@ public:
         rowItr = lines->insert(++rowItr, *temp);
         colItr = rowItr->begin();
 
+        cursorY++;
+        cursorX = 0;
+    }
+
+    void addChar(char c){
+        rowItr->insert(colItr, c);
+        cursorX++;
+    }
+
+    void undoCommand(){
+        if (!undo->empty()){
+            Condition *currentCondition = undo->back();
+            undo->pop_back();
+            redo->push(currentCondition);
+            loadCondition(currentCondition);
+            system("cls");
+            print();
+        }
+    }
+
+    void redoCommand(bool doIt){
+        if (!redo->empty() && doIt){
+            Condition *currentCondition = redo->top();
+            redo->pop();
+            loadCondition(currentCondition);
+            system("cls");
+            print();
+        }
+    }
+
+    // clears redo stack when some key is pressed interrupting undo queue
+    bool clearRedoStack(bool doIt){
+        if (doIt){
+            while (!redo->empty()){
+                redo->pop();
+            }
+        }
+        return false;
+    }
+
+    void run(Files *file){
+        loadFile(file);
+
+        system("color F0");
+        system("cls");
+
+        print();
+
+        bool modify = false;
+        bool doIt = false;
+
+        if (rowItr->empty()){
+            rowItr->push_back(' ');
+            colItr = rowItr->begin();
+        }
+
+        while (true){
+
+            // cout << rowItr->size() << endl;
+            // cout << cursorX << endl;
+            // cout << *colItr << endl;
+
+            gotoxy(cursorX, cursorY);
+            char c = getch();
+
+            bool capsLockState = GetKeyState(VK_CAPITAL);
+
+            if (c == 0 || GetAsyncKeyState(VK_SHIFT) || c == 9 || capsLockState)
+                continue;
+            else if (c == 72)
+            {
+                moveUp();
+            }
+            else if (c == 80)
+            {
+                moveDown();
+            }
+            else if (c == 75)
+            {
+                moveLeft();
+            }
+            else if (c == 77)
+            {
+                moveRight();
+            }
+            else if (c == 13)
+            { // enter key pressed
+                saveCondition();
+                addNewLine();
+                modify = true;
+            }
+            else if (c == 27)
+            { // escape key pressed
+                break;
+            }
+            else if (c == 8)
+            { // backspace pressed
+                saveCondition();
+                removeBack();
