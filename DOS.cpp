@@ -592,3 +592,102 @@ public:
             { // backspace pressed
                 saveCondition();
                 removeBack();
+                modify = true;
+            }
+            else if (c == 83)
+            { // delete pressed
+                saveCondition();
+                removeForward();
+                modify = true;
+            }
+            else if (c == 26)
+            { // CTRL + Z
+                undoCommand();
+                doIt = true;
+            }
+            else if (c == 25)
+            { // CTRL + Y
+                redoCommand(doIt);
+            }
+            else
+            { // insert character
+                saveCondition();
+                addChar(c);
+                modify = true;
+            }
+
+            if (modify)
+            {
+                system("cls");
+                print();
+                modify = false;
+                doIt = clearRedoStack(doIt);
+            }
+        }
+
+        save(file);
+        system("color 07");
+        system("cls");
+    }
+};
+
+// tree class
+class Tree
+{
+public:
+    Directory *root;
+    Directory *current;
+    string prompt = "> ";
+    queue<Files *> *printFiles;
+    priority_queue<Files *> *printFilesPriority;
+    int timer;
+
+    Tree()
+    {
+        current = root = new Directory("V", nullptr);
+        printFiles = new queue<Files *>();
+        printFilesPriority = new priority_queue<Files *>();
+        timer = 0;
+    }
+
+    void addFile(string _name, string _data)
+    {
+        root->files->push_back(Files(_name, _data));
+    }
+
+    void addDirectory(string _name)
+    {
+        root->directories->push_back(Directory(_name, root));
+    }
+
+    void printPath()
+    {
+        cout << root->path << endl;
+    }
+
+    // dir function
+    void dir()
+    {
+        if (current->directories->size() == 0 && current->files->size() == 0)
+        {
+            cout << "no files" << endl;
+        }
+        else
+        {
+            for (auto it = current->directories->begin(); it != current->directories->end(); ++it)
+            {
+                cout << "           DIR         " << it->name << endl;
+            }
+            cout << endl
+                 << endl;
+            for (auto it = current->files->begin(); it != current->files->end(); ++it)
+            {
+                cout << "           File(s)         "
+                     << "(" << it->size << ") bytes " << it->name << endl;
+            }
+
+            cout << endl
+                 << "\t\t(" << current->directories->size() << ") Dir(s)" << endl;
+            cout << "\t\t(" << current->files->size() << ") File(s)" << endl;
+        }
+    }
