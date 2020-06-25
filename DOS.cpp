@@ -691,3 +691,102 @@ public:
             cout << "\t\t(" << current->files->size() << ") File(s)" << endl;
         }
     }
+
+    // mkdir function
+    void mkdir(string _name)
+    {
+
+        if (_name.empty())
+        {
+            cout << "Invalid syntax" << endl;
+            return;
+        }
+
+        if (_name.find("\\") != string::npos || _name == "V:\\" || _name == "V:")
+        {
+            cout << "Invalid syntax" << endl;
+            return;
+        }
+
+        // checking if directory already exists
+        if (!current->checkDirectory(_name) && !current->checkFile(_name))
+        {
+            current->directories->push_back(Directory(_name, current));
+        }
+        else
+        {
+            cout << "Directory or name already exists" << endl;
+        }
+    }
+
+    // rmdir function
+    void rmdir(string _name)
+    {
+        if (!current->checkDirectory(_name))
+        {
+            cout << "Directory not found" << endl;
+            return;
+        }
+        for (auto it = current->directories->begin(); it != current->directories->end(); ++it)
+        {
+            if (it->name == _name)
+            {
+                current->directories->erase(it);
+                break;
+            }
+        }
+    }
+
+    // mkfile function
+    void mkfile(string _name)
+    {
+
+        if (_name.empty())
+        {
+            cout << "Invalid syntax" << endl;
+            return;
+        }
+        string text = _name.substr(_name.find(".") + 1, _name.length() - 1);
+        if (text != "txt")
+        {
+            _name = _name.substr(0, _name.find(".")) + ".txt";
+        }
+        // checking for duplicate file names
+        if (!current->checkFile(_name) && !current->checkDirectory(_name))
+        {
+            // add txt extension in the file name if it is not provieded
+
+            cout << "Enter file data: ";
+            string fileData = getInput();
+            current->addFile(_name, fileData);
+        }
+        else{
+            cout << "File or name already exists" << endl;
+        }
+    }
+
+    // rmfile function
+    void rmfile(string _name)
+    {
+        if (!current->checkFile(_name))
+        {
+            cout << "File not found" << endl;
+            return;
+        }
+        for (auto it = current->files->begin(); it != current->files->end(); ++it)
+        {
+            if (it->name == _name)
+            {
+                current->files->erase(it);
+                break;
+            }
+        }
+    }
+
+    string getNameWithExt(string name){
+        if (name.find(".") != string::npos){
+            if (name.substr(name.find("."), name.size() - 1) != "txt"){
+                name = name.substr(0, name.find(".")) + ".txt";
+            }
+        }
+        else{
