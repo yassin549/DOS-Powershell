@@ -790,3 +790,102 @@ public:
             }
         }
         else{
+            name += ".txt";
+        }
+        return name;
+    }
+    // rename function
+    void rename(string oldname)
+    {
+        string currentnName = oldname.substr(0, oldname.find(" "));
+        currentnName = getNameWithExt(currentnName);
+        cout<<currentnName<<endl;
+        string newName = oldname.substr(oldname.find(" ")+1, oldname.length() - 1);
+        newName = getNameWithExt(newName);
+        cout << newName << endl;
+        if (current->checkFile(currentnName))
+        {
+            for (auto it = current->files->begin(); it != current->files->end(); ++it)
+            {
+                if (it->name == currentnName)
+                {
+                    it->name = newName;
+                    return;
+                }
+            }
+        }
+        else if (current->checkDirectory(currentnName))
+        {
+            for (auto it = current->directories->begin(); it != current->directories->end(); ++it)
+            {
+                if (it->name == currentnName)
+                {
+                    // do update the path of the directory as well
+                    it->path = it->parent->path + newName + "\\";
+                    it->name = newName;
+                    return;
+                }
+            }
+        }
+        else
+        {
+            cout << "file or directory not found" << endl;
+        }
+    }
+
+    void attrib(string att)
+    {
+        Files *file = current->findFile(att);
+        if (file == nullptr)
+        {
+            cout << "file not found" << endl;
+            return;
+        }
+        cout << "file name is " << file->name << endl;
+        cout << "file data is " << file->data << endl;
+    }
+    void find(string filename)
+    {
+
+        Files *file = current->findFile(filename);
+        if (file == nullptr)
+        {
+            cout << "file not found" << endl;
+            return;
+        }
+        cout << "file name is " << file->name << endl;
+        cout << "file data is " << file->data << endl;
+    }
+
+    // findf function
+    void findf(string input)
+    {
+
+        string name = input.substr(0, input.find(" "));
+        string text = input.substr(input.find(" ") + 1, input.length() - 1);
+
+        Files *file = current->findFile(name);
+        if (file == nullptr)
+        {
+            cout << "file not found" << endl;
+            return;
+        }
+        string fileData = file->data;
+        if (fileData.find(text) != string::npos)
+        {
+            cout << "text found" << endl;
+            cout << "file name is " << file->name << endl;
+            cout << "file data is " << file->data << endl;
+        }
+        else
+        {
+            cout << "text not found" << endl;
+        }
+    }
+
+    // findStr function
+    void findStr(string text)
+    {
+        for (auto it = current->files->begin(); it != current->files->end(); ++it)
+        {
+            if (it->data.find(text) != string::npos)
