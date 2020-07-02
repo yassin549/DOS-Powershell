@@ -889,3 +889,102 @@ public:
         for (auto it = current->files->begin(); it != current->files->end(); ++it)
         {
             if (it->data.find(text) != string::npos)
+            {
+                cout << "file name is " << it->name << endl;
+                cout << "file data is " << it->data << endl;
+            }
+        }
+    }
+
+    // format function
+    void format()
+    {
+        root = current = new Directory("V", nullptr);
+    }
+
+    // utility function to delete a file given specified a path
+    void deleteFile(string src)
+    {
+        if (src.find("V:\\") != string::npos || src.find("V:") != string::npos)
+        {
+            return deleteFile(src.substr(src.find("\\") + 1, src.length() - 1));
+        }
+        else if (src.find("\\") != string::npos)
+        {
+            string name = src.substr(0, src.find("\\"));
+
+            for (auto it = current->directories->begin(); it != current->directories->end(); ++it)
+            {
+                if (it->name == name)
+                {
+                    return deleteFile(src.substr(src.find("\\") + 1, src.length() - 1));
+                }
+            }
+        }
+        else
+        {
+            for (auto it = current->files->begin(); it != current->files->end(); ++it)
+            {
+                if (it->name == src)
+                {
+                    current->files->erase(it);
+                    return;
+                }
+            }
+        }
+    }
+
+    // utility function to delete a directory given specified a path
+    void deleteDirectory(string src)
+    {
+        if (src.find("V:\\") != string::npos || src.find("V:") != string::npos)
+        {
+            return deleteDirectory(src.substr(src.find("\\") + 1, src.length() - 1));
+        }
+        else if (src.find("\\") != string::npos)
+        {
+            string name = src.substr(0, src.find("\\"));
+
+            for (auto it = current->directories->begin(); it != current->directories->end(); ++it)
+            {
+                if (it->name == name)
+                {
+                    return deleteDirectory(src.substr(src.find("\\") + 1, src.length() - 1));
+                }
+            }
+        }
+        else
+        {
+            for (auto it = current->directories->begin(); it != current->directories->end(); ++it)
+            {
+                if (it->name == src)
+                {
+                    current->directories->erase(it);
+                    return;
+                }
+            }
+        }
+    }
+
+    // utility function to set path after moving directory
+    void setPathAfterMove(Directory *src)
+    {
+        for (auto it = src->directories->begin(); it != src->directories->end(); ++it)
+        {
+            it->path = src->path + it->name + "\\";
+            setPathAfterMove(&(*it));
+        }
+    }
+
+    // move directory form source to destination or file
+    void move(string input)
+    {
+        string src = input.substr(0, input.find(" "));
+        string des = input.substr(input.find(" ") + 1, input.length() - 1);
+
+        if (src.empty() || des.empty())
+        {
+            cout << "Invalid syntax" << endl;
+            return;
+        }
+
