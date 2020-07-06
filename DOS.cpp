@@ -988,3 +988,169 @@ public:
             return;
         }
 
+        // check if source exists
+        Directory *srcDir = current->getDirectoryFromPath(src);
+        Files *srcFile = current->findFile(src);
+        if (srcDir == nullptr && srcFile == nullptr)
+        {
+            cout << "Source not found" << endl;
+            return;
+        }
+
+        // check if destination exists
+        Directory *desDir = current->getDirectoryFromPath(des);
+        Files *desFile = current->findFile(des);
+        if (desFile != nullptr)
+        {
+            // simply copy content of source file to destination file and remove source file
+            if (srcFile != nullptr)
+            {
+                desFile->data = srcFile->data;
+                desFile->size = srcFile->size;
+                deleteFile(src);
+            }
+            else if (srcDir != nullptr)
+            {
+                cout << "Cannot move directory to file" << endl;
+            }
+            return;
+        }
+        else if (desDir == nullptr)
+        {
+            cout << "Destination not found" << endl;
+            return;
+        }
+
+        // check if destination is not a child of source
+        if (srcDir != nullptr)
+        {
+            Directory *temp = desDir;
+            while (temp != nullptr)
+            {
+                if (temp == srcDir)
+                {
+                    cout << "Cannot move directory to its child" << endl;
+                    return;
+                }
+                temp = temp->parent;
+            }
+        }
+
+        // move directory to destination
+        if (srcDir != nullptr)
+        {
+            srcDir->parent = desDir;
+            srcDir->path = desDir->path + srcDir->name + "\\";
+            desDir->directories->push_back(*srcDir);
+            setPathAfterMove(srcDir);
+            deleteDirectory(src);
+        }
+        else if (srcFile != nullptr)
+        {
+            // move file to destination
+            desDir->files->push_back(*srcFile);
+            deleteFile(src);
+        }
+    }
+
+    // copy directory form source to destination or file
+    void copy(string input)
+    {
+
+        // folder to folder -> it will copy all the files inside this directory to destination
+        // file to folder-> it will copy the file to destination if there is no file of it's name
+        // file to file -> it will copy the data
+        // folder to file -> it will copy and add the data of all the files in the directory
+
+        int count = 0;
+
+        string src = input.substr(0, input.find(" "));
+        string des = input.substr(input.find(" ") + 1, input.length() - 1);
+
+        if (src.empty() || des.empty())
+        {
+            cout << "Invalid syntax" << endl;
+            return;
+        }
+
+        // check if source exists
+        Directory *srcDir = current->getDirectoryFromPath(src);
+        Files *srcFile = current->findFile(src);
+
+        if (srcDir == nullptr && srcFile == nullptr)
+        {
+            cout << "Source not found" << endl;
+            return;
+        }
+
+        // check if destination exists
+        Directory *desDir = current->getDirectoryFromPath(des);
+        Files *desFile = current->findFile(des);
+
+        if (desFile == nullptr && desDir == nullptr)
+        {
+            cout << "Destination not found" << endl;
+            return;
+        }
+
+        // now 4 cases
+
+        // folder to folder
+        if (srcDir != nullptr && desDir != nullptr)
+        {
+
+            // copy all the files in the directory to destination
+            for (auto it = srcDir->files->begin(); it != srcDir->files->end(); ++it)
+            {
+                if (desDir->checkFile(it->name))
+                {
+                    Files *temp = desDir->findFile(it->name);
+                    temp->data = it->data;
+                    temp->size = it->size;
+                }
+                else
+                {
+                    desDir->files->push_back(copyFile(&(*it)));
+                }
+                count++;
+            }
+
+            cout << count << " file(s) copied" << endl;
+        }
+        // file to folder
+        else if (srcFile != nullptr && desDir != nullptr)
+        {
+
+            // check if file of same name exists
+            if (desDir->checkFile(srcFile->name))
+            {
+                Files *temp = desDir->findFile(srcFile->name);
+                temp->data = srcFile->data;
+                temp->size = srcFile->size;
+                cout << "1 file(s) copied" << endl;
+                return;
+            }
+
+            desDir->files->push_back(copyFile(srcFile));
+            cout << "1 file(s) copied" << endl;
+        }
+        // file to file
+        else if (srcFile != nullptr && desFile != nullptr)
+        {
+            desFile->data = srcFile->data;
+            desFile->size = srcFile->size;
+            cout << "1 file(s) copied" << endl;
+        }
+        // folder to file
+        else if (srcDir != nullptr && desFile != nullptr)
+        {
+
+            // copy all the files in the directory to destination
+            desFile->data = "";
+            desFile->size = 0;
+            for (auto it = srcDir->files->begin(); it != srcDir->files->end(); ++it)
+            {
+                desFile->data += it->data;
+                desFile->size += it->size;
+                count++;
+
