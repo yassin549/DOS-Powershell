@@ -1154,3 +1154,102 @@ public:
                 desFile->size += it->size;
                 count++;
 
+            }
+
+            cout << count << " file(s) copied" << endl;
+        }
+    }
+
+    // make a new file and copy the data of the file in it
+    Files copyFile(Files *src)
+    {
+        return Files(src->name, src->data);
+    }
+
+    // add file to queue
+    void print(string input)
+    {
+        Files *file = current->findFile(input);
+
+        if (file == nullptr)
+        {
+            cout << "File not found" << endl;
+            return;
+        }
+
+        printFiles->push(file);
+    }
+
+    // add file to priority queue
+    void pprint(string input)
+    {
+        Files *file = current->findFile(input);
+
+        if (file == nullptr)
+        {
+            cout << "File not found" << endl;
+            return;
+        }
+
+        printFilesPriority->push(file);
+    }
+
+    // print files in queue
+    void Queue()
+    {
+        if (printFiles->empty())
+        {
+            cout << "No files in queue" << endl;
+            return;
+        }
+
+        for (int i = 0; i < printFiles->size(); i++)
+        {
+            Files *temp = printFiles->front();
+            printFiles->pop();
+            cout << temp->name << endl;
+            printFiles->push(temp);
+        }
+    }
+
+    // print files in priority queue
+    void pqueue()
+    {
+        if (printFilesPriority->empty())
+        {
+            cout << "No files in queue" << endl;
+            return;
+        }
+
+        priority_queue<Files *> *temp = new priority_queue<Files *>();
+
+        while (!printFilesPriority->empty())
+        {
+            Files *file = printFilesPriority->top();
+            printFilesPriority->pop();
+            cout << file->name << endl;
+            temp->push(file);
+        }
+
+        printFilesPriority = temp;
+    }
+
+    void tree(Directory *temp, int space = 0)
+    {
+        for (int i = space - 5; i > 0; i--)
+        {
+            if (i == space - 5)
+            {
+                cout << "|";
+            }
+            else
+            {
+                cout << " ";
+            }
+        }
+
+        if (space >= 5)
+        {
+            cout << "|_____";
+        }
+        cout << temp->name << endl;
