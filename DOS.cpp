@@ -1253,3 +1253,102 @@ public:
             cout << "|_____";
         }
         cout << temp->name << endl;
+        for (auto it = temp->directories->begin(); it != temp->directories->end(); ++it)
+        {
+            tree(&(*it), space + 5);
+        }
+    }
+
+    void openEditor(string filename)
+    {
+        Files *file = current->findFile(filename);
+        if (file == nullptr)
+        {
+            cout << "File not found" << endl;
+            return;
+        }
+
+        TextEditor editor;
+        editor.run(file);
+    }
+
+    // input function
+    bool input()
+    {
+        cout << current->path << prompt;
+        string input = getInput();
+
+        if (input == "exit")
+        {
+            system("cls");
+            return false;
+        }
+        else if (input == "prompt")
+        {
+            prompt = prompt == "> " ? "$ " : "> ";
+        }
+        else if (input == "format")
+        {
+            format();
+        }
+        else if (input == "dir")
+        {
+            dir();
+        }
+        else if (input == "tree")
+        {
+            tree(current);
+        }
+        else if (input == "cd.." || input == "cd ..")
+        {
+            if (current->parent != nullptr)
+            {
+                current = current->parent;
+            }
+        }
+        else if (input == "cd/")
+        {
+            current = root;
+        }
+        else if (input == "cd.")
+        {
+            current->printPath();
+        }
+        else if (input == "help")
+        {
+            help();
+        }
+        else if (input == "cls")
+        {
+            system("cls");
+            header();
+        }
+        else if (input.substr(0, 3) == "cd ")
+        {
+
+            Directory *temp = current->getDirectoryFromPath(input.substr(3, input.length() - 1));
+            if (temp != nullptr)
+            {
+                current = temp;
+            }
+            else
+            {
+                cout << "Directory not found" << endl;
+            }
+        }
+        else if (input.substr(0, 8) == "findstr ")
+        {
+            findStr(input.substr(8, input.length() - 1));
+        }
+        else if (input.substr(0, 6) == "findf ")
+        {
+            findf(input.substr(6, input.length() - 1));
+        }
+        else if (input.substr(0, 5) == "copy ")
+        {
+            copy(input.substr(5, input.length() - 1));
+        }
+        else if (input.substr(0, 5) == "move ")
+        {
+            move(input.substr(5, input.length() - 1));
+        }
