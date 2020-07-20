@@ -1153,7 +1153,6 @@ public:
                 desFile->data += it->data;
                 desFile->size += it->size;
                 count++;
-
             }
 
             cout << count << " file(s) copied" << endl;
@@ -1253,6 +1252,7 @@ public:
             cout << "|_____";
         }
         cout << temp->name << endl;
+
         for (auto it = temp->directories->begin(); it != temp->directories->end(); ++it)
         {
             tree(&(*it), space + 5);
@@ -1352,3 +1352,142 @@ public:
         {
             move(input.substr(5, input.length() - 1));
         }
+        else if (input.substr(0, 7) == "attrib ")
+        {
+            attrib(input.substr(7, input.length() - 1));
+        }
+        else if (input.substr(0, 6) == "mkdir "){
+            mkdir(input.substr(6, input.length() - 1));
+        }
+        else if (input.substr(0, 7) == "mkfile "){
+            mkfile(input.substr(7, input.length() - 1));
+        }
+        else if (input.substr(0, 6) == "rmdir "){
+            rmdir(input.substr(6, input.length() - 1));
+        }
+        else if (input.substr(0, 6) == "print ")
+        {
+            print(input.substr(6, input.length() - 1));
+        }
+        else if (input.substr(0, 7) == "pprint ")
+        {
+            pprint(input.substr(7, input.length() - 1));
+        }
+        else if (input.substr(0, 5) == "queue")
+        {
+            Queue();
+        }
+        else if (input.substr(0, 6) == "pqueue")
+        {
+            pqueue();
+        }
+        else if (input == "pwd")
+        {
+            current->printPath();
+        }
+        else if (input.substr(0, 5) == "edit ")
+        {
+            openEditor(input.substr(5, input.length() - 1));
+            system("cls");
+            header();
+        }
+        else if (input.substr(0, 6) == "rename")
+        {
+            string oldname = input.substr(7, input.length() - 1);
+            rename(oldname);
+        }
+        else if (input.substr(0, 5) == "rmfil")
+        {
+            rmfile(input.substr(6, input.length() - 1));
+        }
+        else if (input.substr(0, 5) == "find ")
+        {
+            string filename = input.substr(5, input.length() - 1);
+            find(filename);
+        }
+        else
+        {
+            cout << "Invalid command" << endl;
+        }
+
+        timer++;
+
+        if (timer == 3)
+        {
+            timer = 0;
+            if (!printFiles->empty())
+            {
+                printFiles->pop();
+            }
+            if (!printFilesPriority->empty())
+            {
+                printFilesPriority->pop();
+            }
+        }
+
+        return true;
+    }
+
+    // get input
+    string getInput()
+    {
+        string input;
+        getline(cin, input);
+        return input;
+    }
+
+    // run function
+    void run()
+    {
+        system("cls");
+        header();
+        while (input())
+            ;
+    }
+
+    // help function
+    void help()
+    {
+        cout << "attrib - see the file data" << endl;
+        cout << "find <file name> - find file" << endl;
+        cout << "findf <file name> <text> - find file with text" << endl;
+        cout << "dir - list directory" << endl;
+        cout << "cd.. - go to parent directory" << endl;
+        cout << "cd <directory name> - go to directory" << endl;
+        cout << "mkdir <directory name> - create directory" << endl;
+        cout << "mkfile <file name> - create file" << endl;
+        cout << "rmdir <directory name> - remove directory" << endl;
+        cout << "rmfile <file name> - remove file" << endl;
+        cout << "pwd see the current working directory" << endl;
+        cout << "rename <old name> <new name> rename file or directory" << endl;
+        cout << "exit - exit program" << endl;
+        cout << "cls - clear screen" << endl;
+        cout << "format for format the disk" << endl;
+        cout << "move <source> <destination> move file or directory" << endl;
+        cout << "copy <source> <destination> copy file or directory" << endl;
+        cout << "findstr <text> find text in files" << endl;
+        cout << "prompt change prompt" << endl;
+        cout << "tree prints all directories in tree structure" << endl;
+        cout << "print <file name> add file to queue" << endl;
+        cout << "pprint <file name> add file to priority queue" << endl;
+        cout << "queue print files in queue" << endl;
+        cout << "pqueue print files in priority queue" << endl;
+        cout << "edit <fileName> opens editor to edit file" << endl;
+    }
+
+    void header()
+    {
+        cout << "DOS Shell\tDSA Project\t" << endl;
+        cout << "2022-CS-115 && 2022-CS-123" << endl;
+        cout << "==========================" << endl;
+    }
+};
+
+int main()
+{
+    Tree tree;
+
+    tree.run();
+
+    return 0;
+}
