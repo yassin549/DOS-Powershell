@@ -1,7 +1,3 @@
-Here’s the enhanced and rewritten version of the README file:  
-
----
-
 # **DOS Shell with Integrated Text Editor**
 
 ## **Overview**  
